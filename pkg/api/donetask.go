@@ -1,26 +1,17 @@
-package database
+package api
 
 import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"go1f/pkg/database"
 )
-
-// Функция удаления задачи
-func DeleteTask(id string) error {
-
-	_, err := database.Exec("DELETE FROM scheduler WHERE id = ?", id)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 // Обработчик выполненной задачи, для POST запроса
 func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
-	var task Task
+	var task database.Task
 	id := r.URL.Query().Get("id")
 
 	if id == "" {
@@ -28,7 +19,7 @@ func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := GetTaskByID(id)
+	task, err := database.GetTaskByID(id)
 
 	if err != nil {
 		http.Error(w, `{"error":"задания по заданному id нет"}`, http.StatusInternalServerError)
@@ -37,7 +28,7 @@ func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	if task.Repeat == "" {
 		// Удаление задачи, если она не повторяющаяся
-		err = DeleteTask(task.ID)
+		err = database.DeleteTaskById(task.ID)
 		if err != nil {
 			http.Error(w, `{"error":"Ошибка при удалении задачи"}`, http.StatusInternalServerError)
 			return
@@ -45,18 +36,15 @@ func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		// Обновление даты для повторяющейся задачи
-		newDate, err := NextDate(time.Now(), task.Date, task.Repeat)
+		newDate, err := database.NextDate(time.Now(), task.Date, task.Repeat)
 		if err != nil {
 			http.Error(w, `{"error":"Ошибка при обновлении даты"}`, http.StatusInternalServerError)
 			return
 		}
 
 		task.Date = newDate
-		_, err = database.Exec("UPDATE scheduler SET date = ? WHERE id = ?", task.Date, task.ID)
-		if err != nil {
-			http.Error(w, `{"error":"Ошибка при обновлении задачи"}`, http.StatusInternalServerError)
-			return
-		}
+		database.UpdateDate(&task)
+
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")

@@ -2,9 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"log"
+
 	"go1f/pkg/database"
 	"go1f/pkg/server"
-	"log"
 )
 
 func main() {

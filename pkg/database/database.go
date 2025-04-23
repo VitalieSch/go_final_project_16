@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 	_ "modernc.org/sqlite"
@@ -13,20 +14,21 @@ var database *sql.DB
 // Инициализация базы данных
 func Init(dbFile string) error {
 
-	db, err := sql.Open("sqlite3", dbFile)
+	_, err := os.Stat(dbFile)
+	var install bool
+	if err != nil {
+		install = true
+	}
+
+	db, err := sql.Open("sqlite", dbFile)
 	if err != nil {
 		return fmt.Errorf("не удалось открыть файл: %v", err)
 	}
 	database = db
 
-	var tableExists int
-	err = db.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='scheduler'").Scan(&tableExists)
+	if install {
+		//Создаем таблицу,если ее нет
 
-	if err != nil {
-		return fmt.Errorf("не удалось проверить существует ли таблица: %v", err)
-	}
-	//Создаем таблицу,если ее нет
-	if tableExists == 0 {
 		schema := `
 		CREATE TABLE scheduler (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,

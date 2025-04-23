@@ -1,14 +1,15 @@
 package api
 
 import (
-	"go1f/pkg/database"
 	"net/http"
+
+	"go1f/pkg/database"
 )
 
 func Init() {
 
 	http.HandleFunc("/api/nextdate", database.NextDateHandler)
-	http.HandleFunc("/api/task", database.TaskHandler)
-	http.HandleFunc("/api/tasks", database.GetTasksHandler)
-	http.HandleFunc("/api/task/done", database.DoneTaskHandler)
+	http.HandleFunc("/api/task", TaskHandler)
+	http.HandleFunc("/api/tasks", GetTasksHandler)
+	http.HandleFunc("/api/task/done", DoneTaskHandler)
 }

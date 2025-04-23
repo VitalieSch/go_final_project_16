@@ -9,11 +9,13 @@ import (
 	"time"
 )
 
+const DateFmt = "20060102"
+
 // Вычисляем следующую дату выполнения задачи
 func NextDate(now time.Time, date string, repeat string) (string, error) {
 
 	//Анализируем исходную дату
-	startDate, err := time.Parse("20060102", date)
+	startDate, err := time.Parse(DateFmt, date)
 	if err != nil {
 		return "", errors.New("ошибка анализа исходной даты")
 	}
@@ -38,7 +40,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 				break
 			}
 		}
-		return nextDate.Format("20060102"), nil
+		return nextDate.Format(DateFmt), nil
 
 	case repeat == "y":
 		startDate = startDate.AddDate(1, 0, 0)
@@ -48,7 +50,7 @@ func NextDate(now time.Time, date string, repeat string) (string, error) {
 	default:
 		return "", errors.New("неверный формат повторений")
 	}
-	return startDate.Format("20060102"), nil
+	return startDate.Format(DateFmt), nil
 }
 
 // Обработчик запросов для "/api/nextdate"
@@ -76,7 +78,7 @@ func NextDateHandler(w http.ResponseWriter, r *http.Request) {
 
 func parseTime(nowStr string) (time.Time, error) {
 
-	timeParse, err := time.Parse("20060102", nowStr)
+	timeParse, err := time.Parse(DateFmt, nowStr)
 
 	return timeParse, err
 }

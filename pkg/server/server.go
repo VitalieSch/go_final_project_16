@@ -2,8 +2,9 @@ package server
 
 import (
 	"fmt"
-	"go1f/pkg/api"
 	"net/http"
+
+	"go1f/pkg/api"
 )
 
 func Run() error {
