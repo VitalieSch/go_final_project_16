@@ -27,6 +27,9 @@ func GetTasks() ([]Task, error) {
 
 		tasks = append(tasks, task)
 	}
+	if err = rows.Err(); err != nil {
+		return nil, errors.New("ошибка при получении данных")
+	}
 
 	return tasks, nil
 }

@@ -36,7 +36,7 @@ func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	} else {
 		// Обновление даты для повторяющейся задачи
-		newDate, err := database.NextDate(time.Now(), task.Date, task.Repeat)
+		newDate, err := NextDate(time.Now(), task.Date, task.Repeat)
 		if err != nil {
 			http.Error(w, `{"error":"Ошибка при обновлении даты"}`, http.StatusInternalServerError)
 			return
